@@ -139,7 +139,8 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Booking%28MEMBER%29.cpp" />
+    <ClCompile Include="Booking%28MEMBERnSTAFF%29.cpp" />
+    <ClCompile Include="Feedback%28MS%29.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
