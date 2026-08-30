@@ -18,11 +18,7 @@ string feedbackDate[MAX_FEEDBACK];
 
 int feedbackCount = 0;
 
-
-// ==============================
 // GET CURRENT DATE (DD/MM/YYYY)
-// ==============================
-
 string getCurrentDate()
 {
     time_t now = time(0);
@@ -39,11 +35,7 @@ string getCurrentDate()
     return dayStr + "/" + monthStr + "/" + to_string(year);
 }
 
-
-// ==============================
 // SUBMIT FEEDBACK
-// ==============================
-
 void submitFeedback(int memberID)
 {
     if (feedbackCount >= MAX_FEEDBACK)
@@ -93,11 +85,7 @@ void submitFeedback(int memberID)
     feedbackCount++;
 }
 
-
-// ==============================
 // VIEW MY FEEDBACK (MEMBER)
-// ==============================
-
 void viewMyFeedback(int memberID)
 {
     bool found = false;
@@ -125,11 +113,7 @@ void viewMyFeedback(int memberID)
     }
 }
 
-
-// ==============================
 // STAFF: VIEW ALL FEEDBACK
-// ==============================
-
 void viewAllFeedback()
 {
     if (feedbackCount == 0)
@@ -152,11 +136,7 @@ void viewAllFeedback()
     }
 }
 
-
-// ==============================
 // STAFF: SEARCH FEEDBACK BY TOPIC KEYWORD
-// ==============================
-
 void searchFeedbackByTopic()
 {
     string keyword;
@@ -192,11 +172,7 @@ void searchFeedbackByTopic()
     }
 }
 
-
-// ==============================
 // STAFF: OVERALL AVERAGE RATING
-// ==============================
-
 void averageRatingReport()
 {
     if (feedbackCount == 0)
@@ -220,10 +196,7 @@ void averageRatingReport()
 }
 
 
-// ==============================
 // MEMBER FEEDBACK MENU
-// ==============================
-
 void memberFeedbackMenu(int memberID)
 {
     int choice;
@@ -259,10 +232,7 @@ void memberFeedbackMenu(int memberID)
 }
 
 
-// ==============================
 // STAFF FEEDBACK MENU
-// ==============================
-
 void staffFeedbackMenu()
 {
     int choice;
