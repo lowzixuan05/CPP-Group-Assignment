@@ -148,7 +148,7 @@
     <ClCompile Include="reporting and statistic.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Billing &amp; Payment Processing" />
+    <None Include="Billing &amp; Payment Processing.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -438,12 +438,12 @@ void membershipReport()
     cout << "==============================================\n";
 }
 
-
+void reporting();
 // =====================================================
 // MAIN REPORT MENU
 // =====================================================
 
-int main()
+void reporting()
 {
     int choice;
 
@@ -493,5 +493,5 @@ int main()
 
     } while (choice != 5);
 
-    return 0;
+    return;
 }

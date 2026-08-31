@@ -117,6 +117,7 @@ int nextReceiptId = 6001;
 
 // ==================== PROTOTYPES ====================
 // Menus
+void splash();
 void mainMenu();
 void memberPortal();
 void staffPortal();
@@ -148,12 +149,12 @@ void printInvoice(const Invoice& inv);
 void printReceiptSlip(const Receipt& r);
 
 // ==================== MAIN ====================
-int main() {
+void splash() {
     cout << "=========================================\n";
     cout << "   GYM MEMBERSHIP BILLING & PAYMENT SYSTEM\n";
     cout << "=========================================\n";
     mainMenu();
-    return 0;
+    return;
 }
 
 // ==================== MAIN MENU ====================

@@ -9,13 +9,15 @@ void memberMainMenu();
 void staffMemberManagementMenu();
 void staffBookingMenu();
 void staffFeedbackMenu();
-
+void advertisemenModule();
+void reporting();
 
 //Member Modules
 extern void memberMemberManagementMenu();
 extern void memberBookingMenu(int memberID);
+extern void appointmentModule();
 extern void memberFeedbackMenu(int memberID);
-
+extern void mainMenu();
 
 
 
@@ -78,15 +80,24 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
         cin >> menuChoice;
 
         switch (menuChoice) {
-        case 1:memberMemberManagementMenu();
+        case 1:staffMemberManagementMenu();
             break;
         case 2:
             int memberID;
             cout << "Member ID: ";
             cin >> memberID;
-            memberBookingMenu(memberID);
+            staffBookingMenu();
             break;
-        case 3:
+        case 3:appointmentModule();
+            break;
+        case 4:advertisemenModule();
+            break;
+        case 5:mainMenu();
+            break;
+        case 6:reporting();
+            break;
+        case 7:staffFeedbackMenu();
+            break;
         case 8:break;
         default:cout << "Invalid Choice! Try Again!";
         }
@@ -98,6 +109,7 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
 }
 void memberMainMenu() 
 {
+    int memberID = 0;
     int menuChoice;
     do {
         cout << R"(
@@ -127,29 +139,28 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
         cout << "1. Member Management\n";
         cout << "2. Booking\n";
         cout << "3. Appointment\n";
-        cout << "4. Advertisement\n";
-        cout << "5. Billing and Payment Processing\n";
-        cout << "6. Reporting and Statistic\n";
-        cout << "7. Feedback\n";
-        cout << "8. Back\n";
-        cout << "Enter your Choice (1-8): ";
+        cout << "4. Billing and Payment Processing\n";
+        cout << "5. Feedback\n";
+        cout << "6. Back\n";
+        cout << "Enter your Choice (1-7): ";
         cin >> menuChoice;
 
         switch (menuChoice) {
         case 1:memberMemberManagementMenu();
             break;
-        case 2:
-            int memberID;
-            cout << "Member ID: ";
-            cin >> memberID;
-            memberBookingMenu(memberID);
+        case 2:memberBookingMenu(memberID);
             break;
-        case 3:
-        case 8:break;
+        case 3:appointmentModule();
+            break;
+        case 4:advertisemenModule();
+            break;
+            case 5: memberFeedbackMenu(memberID);
+            break;
+        case 6:break;
         default:cout << "Invalid Choice! Try Again!";
         }
 
-    } while (menuChoice != 8);
+    } while (menuChoice != 6);
     
     cout << " Back to previous menu...";
     return;
