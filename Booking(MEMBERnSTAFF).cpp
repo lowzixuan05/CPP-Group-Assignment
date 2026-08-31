@@ -878,7 +878,7 @@ void staffRescheduleOrCancelBooking()
 // MEMBER BOOKING MENU
 // ==============================
 
-void memberBooking(int memberID)
+void memberBookingMenu(int memberID)
 {
     int choice;
 

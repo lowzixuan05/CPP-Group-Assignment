@@ -24,5 +24,8 @@
     <ClCompile Include="Feedback%28MS%29.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="management.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
