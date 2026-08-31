@@ -139,8 +139,8 @@ void appointmentModule() {
                     }
 
                     int serviceChoice;
-                    cout << "Select service（ 1.Yoga  2.Personal ）" << endl;
-                    cout << "Enter your choice: ";
+                    cout << "Select service (1.Yoga  2.Personal)\n";
+                    cout << "Enter your choice: \n";
                     cin >> serviceChoice;
 
                     switch (serviceChoice) {
@@ -228,7 +228,7 @@ void appointmentModule() {
                         }
 
                         int serviceChoice;
-                        cout << "Select service（ 1.Yoga  2.Personal ）" << endl;
+                        cout << "Select service( 1.Yoga  2.Personal )" << endl;
                         cout << "Enter your choice: ";
                         cin >> serviceChoice;
 

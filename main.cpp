@@ -6,11 +6,11 @@ void staffMainMenu();
 void memberMainMenu();
 
 //Staff Modules
-void staffMemberManagementMenu();
-void staffBookingMenu();
-void staffFeedbackMenu();
-void advertisemenModule();
-void reporting();
+extern void staffMemberManagementMenu();
+extern void staffBookingMenu();
+extern void staffFeedbackMenu();
+extern void advertisementModule();
+extern void reporting();
 
 //Member Modules
 extern void memberMemberManagementMenu();
@@ -56,12 +56,12 @@ void staffMainMenu() {
         cout << R"(
 __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\ 
 \  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \
- \__\  \__\  \__\  \__\  \__\  \__\__\__\  \__\  \__\  \__\  \__\  \__
-__\  \__\  \__\  \__\  \__\  \__\     \__\__\  \__\  \__\  \__\  \__\ 
-\  \__\  \__\  \__\  \__\  \              \__\  \__\  \__\  \__\  \  \
+ \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__
+__\  \__\  \__\  \__\  \__\  \__\  \  \  \__\  \__\  \__\  \__\  \__\ 
+\  \__\  \__\  \__\  \__\  \              \  \__\__\  \__\  \__\  \  \
  \__\  \__\  \__\  \___         Welcome       \  \__\  \__\  \__\  \__
-__\  \__\  \__\  \__\  \___                 \  \__\  \__\  \__\  \__\ 
-\  \__\  \__\  \__\  \__\  \__          _____\  \__\  \__\  \__\  \  \
+__\  \__\  \__\  \__\  \___                 \__\__\  \__\  \__\  \__\ 
+\  \__\  \__\  \__\  \__\  \__            \  \  \  \__\  \  \  \__\  \
  \__\  \__\  \__\  \__\  \__\  \__    __\  \__\  \__\  \__\  \__\  \__
 __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  
 \  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \
@@ -82,15 +82,11 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
         switch (menuChoice) {
         case 1:staffMemberManagementMenu();
             break;
-        case 2:
-            int memberID;
-            cout << "Member ID: ";
-            cin >> memberID;
-            staffBookingMenu();
+        case 2:staffBookingMenu();
             break;
         case 3:appointmentModule();
             break;
-        case 4:advertisemenModule();
+        case 4:advertisementModule();
             break;
         case 5:mainMenu();
             break;
@@ -107,6 +103,8 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
     cout << " Back to previous menu...";
     return;
 }
+
+//Member Main Menu
 void memberMainMenu() 
 {
     int memberID = 0;
@@ -152,7 +150,7 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
             break;
         case 3:appointmentModule();
             break;
-        case 4:advertisemenModule();
+        case 4:advertisementModule();
             break;
             case 5: memberFeedbackMenu(memberID);
             break;
