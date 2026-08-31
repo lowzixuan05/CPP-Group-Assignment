@@ -355,8 +355,7 @@ bool validateBooking(int memberID, int serviceID, string date)
     // Check whether member already booked this service
     for (int i = 0; i < bookingCount; i++)
     {
-        if (bookingMemberIDs[i] == memberID &&
-            bookingServiceIDs[i] == serviceID &&
+        if (bookingServiceIDs[i] == serviceID &&
             bookingDates[i] == date &&
             bookingStatus[i] == "Active")
         {
@@ -403,7 +402,6 @@ void addSingleBooking(int memberID)
     }
 
     bookingIDs[bookingCount] = 1001 + bookingCount;
-    bookingMemberIDs[bookingCount] = memberID;
     bookingServiceIDs[bookingCount] = serviceID;
     bookingDates[bookingCount] = date;
     bookingStatus[bookingCount] = "Active";

@@ -27,5 +27,19 @@
     <ClCompile Include="management.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="advertisement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="appointment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="reporting and statistic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Billing &amp; Payment Processing">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

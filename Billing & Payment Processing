@@ -1,0 +1,772 @@
+/*
+ * Gym Membership Billing & Payment Processing System
+ */
+
+#include <iostream>
+#include <iomanip>
+#include <cstring>
+
+using namespace std;
+
+void safeCopy(char* dest, size_t destSize, const char* src) {
+#ifdef _MSC_VER
+    strcpy_s(dest, destSize, src);
+#else
+    strncpy(dest, src, destSize - 1);
+    dest[destSize - 1] = '\0';
+#endif
+}
+
+// ==================== CONSTANTS ====================
+const int MAX_MEMBERS = 100;
+const int MAX_BOOKINGS = 100;
+const int MAX_APPOINTMENTS = 100;
+const int MAX_INVOICES = 200;
+const int MAX_PAYMENTS = 300;
+const int MAX_RECEIPTS = 300;
+const int NUM_PLANS = 3;
+const double TAX_RATE = 0.08;         // 8% tax
+const double REG_BASE_FEE = 50.0;         // flat one-time registration fee
+const char* CURRENCY = "RM ";
+
+// ==================== STRUCTURES ====================
+struct MembershipPlan {
+    char name[20];
+    double monthlyFee;
+    double discountPercent;
+};
+
+struct Member {
+    int id;
+    char name[50];
+    char phone[15];
+    char planName[20];
+    double monthlyFee;
+    char joinDate[12];
+    char expiryDate[12];
+    bool active;
+};
+
+struct Booking {
+    int bookingId;
+    int memberId;
+    char description[50];
+    double amount;
+    char date[12];
+};
+
+struct Appointment {
+    int appointmentId;
+    int memberId;
+    char description[50];
+    double amount;
+    char date[12];
+};
+
+// type: "Registration", "Renewal", "Booking", "Appointment"
+struct Invoice {
+    int invoiceId;
+    int memberId;
+    char type[15];
+    int refId;          // 0 for Registration/Renewal, else bookingId/appointmentId
+    double totalCharged;
+    char date[12];
+    bool paid;
+    bool receiptGenerated;
+};
+
+struct Payment {
+    int paymentId;
+    int memberId;
+    int invoiceId;
+    char category[15];      // Registration, Renewal, Booking, Appointment
+    double amount;
+    char paymentType[20];   // Cash, E-Wallet, Credit Card, Online Banking
+    char date[12];
+};
+
+struct Receipt {
+    int receiptId;
+    int paymentId;
+    int invoiceId;
+    int memberId;
+    double amount;
+    char date[12];
+};
+
+// ==================== GLOBAL DATA ====================
+MembershipPlan plans[NUM_PLANS] = {
+    {"Basic",   70.0, 0.0},
+    {"Premium", 100.0, 5.0},
+    {"Elite",   150.0, 10.0}
+};
+
+Member       members[MAX_MEMBERS];       int memberCount = 0;
+Booking      bookings[MAX_BOOKINGS];     int bookingCount = 0;
+Appointment  appointments[MAX_APPOINTMENTS]; int appointmentCount = 0;
+Invoice      invoices[MAX_INVOICES];     int invoiceCount = 0;
+Payment      payments[MAX_PAYMENTS];     int paymentCount = 0;
+Receipt      receipts[MAX_RECEIPTS];     int receiptCount = 0;
+
+int nextMemberId = 1001;
+int nextBookingId = 2001;
+int nextAppointmentId = 3001;
+int nextInvoiceId = 4001;
+int nextPaymentId = 5001;
+int nextReceiptId = 6001;
+
+// ==================== PROTOTYPES ====================
+// Menus
+void mainMenu();
+void memberPortal();
+void staffPortal();
+
+// Helpers
+int findMemberIndexById(int id);
+int findPlanIndex(const char planName[]);
+int findInvoiceIndexById(int id);
+bool chooseUnpaidInvoice(int memberId, int& outInvoiceIndex);
+bool choosePaymentType(char outType[]);
+
+// Member functions (1-12)
+void registrationPayment();
+void renewMembership();
+void generateInvoiceBooking();
+void generateInvoiceAppointment();
+void payByType(const char type[]);
+void generateReceiptByType(const char type[]);
+void viewPaymentHistory();
+void validation();
+
+// Staff functions
+void staffViewPayment();
+void staffSearchPayment();
+
+// Shared engine
+void finalizeInvoicePayment(int invoiceIndex, const char paymentType[]);
+void printInvoice(const Invoice& inv);
+void printReceiptSlip(const Receipt& r);
+
+// ==================== MAIN ====================
+int main() {
+    cout << "=========================================\n";
+    cout << "   GYM MEMBERSHIP BILLING & PAYMENT SYSTEM\n";
+    cout << "=========================================\n";
+    mainMenu();
+    return 0;
+}
+
+// ==================== MAIN MENU ====================
+void mainMenu() {
+    int choice;
+    do {
+        cout << "\n============ MAIN MENU ============\n";
+        cout << "1. Member  - Billing / Payment Processing\n";
+        cout << "2. Staff   - Billing / Payment Processing\n";
+        cout << "0. Exit\n";
+        cout << "====================================\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        if (choice == 1) memberPortal();
+        else if (choice == 2) staffPortal();
+        else if (choice != 0) cout << "Invalid choice.\n";
+
+    } while (choice != 0);
+
+    cout << "Exiting System... \n";
+}
+
+// ==================== MEMBER PORTAL ====================
+void memberPortal() {
+    int choice;
+    do {
+        cout << "\n------- MEMBER: Billing / Payment Processing -------\n";
+        cout << " 1. Membership registration payment\n";
+        cout << " 2. Renew membership\n";
+        cout << " 3. Generate Invoice - bookings\n";
+        cout << " 4. Generate Invoice - appointment\n";
+        cout << " 5. Payment Type: Cash\n";
+        cout << " 6. Payment Type: e-wallet (QR code)\n";
+        cout << " 7. Payment Type: Credit card\n";
+        cout << " 8. Payment Type: Online Banking\n";
+        cout << " 9. Generate receipt - bookings\n";
+        cout << "10. Generate receipt - appointment\n";
+        cout << "11. View payment history\n";
+        cout << "12. Validation\n";
+        cout << " 0. Back to Main Menu\n";
+        cout << "------------------------------------------------------\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:  registrationPayment(); break;
+        case 2:  renewMembership(); break;
+        case 3:  generateInvoiceBooking(); break;
+        case 4:  generateInvoiceAppointment(); break;
+        case 5:  payByType("Cash"); break;
+        case 6:  payByType("E-Wallet"); break;
+        case 7:  payByType("Credit Card"); break;
+        case 8:  payByType("Online Banking"); break;
+        case 9:  generateReceiptByType("Booking"); break;
+        case 10: generateReceiptByType("Appointment"); break;
+        case 11: viewPaymentHistory(); break;
+        case 12: validation(); break;
+        case 0:  break;
+        default: cout << "Invalid choice.\n";
+        }
+    } while (choice != 0);
+}
+
+// ==================== STAFF PORTAL ====================
+void staffPortal() {
+    int choice;
+    do {
+        cout << "\n------- STAFF: Billing / Payment Processing -------\n";
+        cout << "1. View payment\n";
+        cout << "2. Search payment\n";
+        cout << "3. Renew membership\n";
+        cout << "0. Back to Main Menu\n";
+        cout << "-----------------------------------------------------\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1: staffViewPayment(); break;
+        case 2: staffSearchPayment(); break;
+        case 3: renewMembership(); break; // staff renews on behalf of a member
+        case 0: break;
+        default: cout << "Invalid choice.\n";
+        }
+    } while (choice != 0);
+}
+
+// ==================== HELPERS ====================
+int findMemberIndexById(int id) {
+    for (int i = 0; i < memberCount; i++)
+        if (members[i].id == id) return i;
+    return -1;
+}
+
+int findPlanIndex(const char planName[]) {
+    for (int i = 0; i < NUM_PLANS; i++)
+        if (strcmp(plans[i].name, planName) == 0) return i;
+    return -1;
+}
+
+int findInvoiceIndexById(int id) {
+    for (int i = 0; i < invoiceCount; i++)
+        if (invoices[i].invoiceId == id) return i;
+    return -1;
+}
+
+// Lists unpaid invoices for a member and lets the user pick one.
+// Returns true and sets outInvoiceIndex if a valid selection was made.
+bool chooseUnpaidInvoice(int memberId, int& outInvoiceIndex) {
+    bool found = false;
+    cout << "\nUnpaid invoices for Member ID " << memberId << ":\n";
+    cout << left << setw(10) << "InvID" << setw(14) << "Type"
+        << setw(10) << "RefID" << setw(12) << "Amount" << endl;
+    cout << string(46, '-') << endl;
+
+    for (int i = 0; i < invoiceCount; i++) {
+        if (invoices[i].memberId == memberId && !invoices[i].paid) {
+            found = true;
+            cout << left << setw(10) << invoices[i].invoiceId
+                << setw(14) << invoices[i].type
+                << setw(10) << invoices[i].refId
+                << setw(12) << fixed << setprecision(2) << invoices[i].totalCharged
+                << endl;
+        }
+    }
+
+    if (!found) {
+        cout << "No unpaid invoices found for this member.\n";
+        return false;
+    }
+
+    int invId;
+    cout << "Enter Invoice ID to pay: ";
+    cin >> invId;
+
+    int idx = findInvoiceIndexById(invId);
+    if (idx == -1 || invoices[idx].memberId != memberId || invoices[idx].paid) {
+        cout << "Invalid invoice selection.\n";
+        return false;
+    }
+
+    outInvoiceIndex = idx;
+    return true;
+}
+
+bool choosePaymentType(char outType[]) {
+    int c;
+    cout << "Select Payment Type:\n";
+    cout << "1. Cash\n2. E-Wallet (QR code)\n3. Credit Card\n4. Online Banking\n";
+    cout << "Enter choice: ";
+    cin >> c;
+
+    switch (c) {
+    case 1: safeCopy(outType, 20, "Cash"); return true;
+    case 2: safeCopy(outType, 20, "E-Wallet"); return true;
+    case 3: safeCopy(outType, 20, "Credit Card"); return true;
+    case 4: safeCopy(outType, 20, "Online Banking"); return true;
+    default: cout << "Invalid selection.\n"; return false;
+    }
+}
+
+// ==================== 1. MEMBERSHIP REGISTRATION PAYMENT ====================
+void registrationPayment() {
+    if (memberCount >= MAX_MEMBERS) {
+        cout << "Member list is full!\n";
+        return;
+    }
+
+    Member m;
+    m.id = nextMemberId++;
+
+    cout << "Enter member name: ";
+    cin.ignore();
+    cin.getline(m.name, 50);
+
+    cout << "Enter phone number: ";
+    cin.getline(m.phone, 15);
+
+    cout << "Available Plans:\n";
+    for (int i = 0; i < NUM_PLANS; i++)
+        cout << "  " << (i + 1) << ". " << plans[i].name
+        << " - " << CURRENCY << plans[i].monthlyFee << "/month\n";
+
+    int planChoice;
+    cout << "Select plan (1-" << NUM_PLANS << "): ";
+    cin >> planChoice;
+    if (planChoice < 1 || planChoice > NUM_PLANS) planChoice = 1;
+
+    safeCopy(m.planName, sizeof(m.planName), plans[planChoice - 1].name);
+    m.monthlyFee = plans[planChoice - 1].monthlyFee;
+    m.active = true;
+
+    cout << "Enter join date (DD-MM-YYYY): ";
+    cin >> m.joinDate;
+    cout << "Enter membership expiry date (DD-MM-YYYY): ";
+    cin >> m.expiryDate;
+
+    members[memberCount++] = m;
+
+    // Calculate total charged: base registration fee + first month's fee + tax
+    double subtotal = REG_BASE_FEE + m.monthlyFee;
+    double tax = subtotal * TAX_RATE;
+    double total = subtotal + tax;
+
+    Invoice inv;
+    inv.invoiceId = nextInvoiceId++;
+    inv.memberId = m.id;
+    safeCopy(inv.type, sizeof(inv.type), "Registration");
+    inv.refId = 0;
+    inv.totalCharged = total;
+    safeCopy(inv.date, sizeof(inv.date), m.joinDate);
+    inv.paid = false;
+    inv.receiptGenerated = false;
+    invoices[invoiceCount++] = inv;
+
+    cout << fixed << setprecision(2);
+    cout << "\nMember registered! Member ID: " << m.id << "\n";
+    cout << "Registration fee: " << CURRENCY << REG_BASE_FEE
+        << " + first month (" << m.planName << "): " << CURRENCY << m.monthlyFee
+        << " + tax: " << CURRENCY << tax << "\n";
+    cout << "Total charged: " << CURRENCY << total << "\n";
+
+    char payType[20];
+    cout << "Proceed to payment now? (1=Yes, 0=No): ";
+    int yn; cin >> yn;
+    if (yn == 1 && choosePaymentType(payType)) {
+        int idx = invoiceCount - 1; // the invoice just created
+        finalizeInvoicePayment(idx, payType);
+    }
+    else {
+        cout << "Payment deferred. Use Payment Type menu later to settle Invoice #"
+            << inv.invoiceId << ".\n";
+    }
+}
+
+// ==================== 2. RENEW MEMBERSHIP ====================
+void renewMembership() {
+    int id;
+    cout << "Enter Member ID to renew: ";
+    cin >> id;
+
+    int idx = findMemberIndexById(id);
+    if (idx == -1) {
+        cout << "Member not found.\n";
+        return;
+    }
+
+    Member& m = members[idx];
+    cout << "Current plan: " << m.planName << " (" << CURRENCY << m.monthlyFee << "/month)\n";
+    cout << "Current expiry: " << m.expiryDate << "\n";
+
+    cout << "Enter new expiry date (DD-MM-YYYY): ";
+    cin >> m.expiryDate;
+    m.active = true;
+
+    double subtotal = m.monthlyFee;
+    int planIdx = findPlanIndex(m.planName);
+    double discount = (planIdx != -1) ? subtotal * plans[planIdx].discountPercent / 100.0 : 0.0;
+    double afterDiscount = subtotal - discount;
+    double tax = afterDiscount * TAX_RATE;
+    double total = afterDiscount + tax;
+
+    Invoice inv;
+    inv.invoiceId = nextInvoiceId++;
+    inv.memberId = m.id;
+    safeCopy(inv.type, sizeof(inv.type), "Renewal");
+    inv.refId = 0;
+    inv.totalCharged = total;
+    safeCopy(inv.date, sizeof(inv.date), m.expiryDate);
+    inv.paid = false;
+    inv.receiptGenerated = false;
+    invoices[invoiceCount++] = inv;
+
+    cout << fixed << setprecision(2);
+    cout << "Renewal fee: " << CURRENCY << subtotal << " - discount " << CURRENCY << discount
+        << " + tax " << CURRENCY << tax << " = Total " << CURRENCY << total << "\n";
+
+    char payType[20];
+    cout << "Proceed to payment now? (1=Yes, 0=No): ";
+    int yn; cin >> yn;
+    if (yn == 1 && choosePaymentType(payType)) {
+        finalizeInvoicePayment(invoiceCount - 1, payType);
+    }
+    else {
+        cout << "Payment deferred. Use Payment Type menu later to settle Invoice #"
+            << inv.invoiceId << ".\n";
+    }
+}
+
+// ==================== 3 & 4. GENERATE INVOICES ====================
+void generateInvoiceBooking() {
+    if (bookingCount >= MAX_BOOKINGS) { cout << "Booking list full!\n"; return; }
+
+    int id;
+    cout << "Enter Member ID: ";
+    cin >> id;
+    if (findMemberIndexById(id) == -1) { cout << "Member not found.\n"; return; }
+
+    Booking b;
+    b.bookingId = nextBookingId++;
+    b.memberId = id;
+
+    cout << "Enter booking description (e.g., Yoga Class, Personal Training): ";
+    cin.ignore();
+    cin.getline(b.description, 50);
+
+    cout << "Enter session amount (" << CURRENCY << "): ";
+    cin >> b.amount;
+
+    cout << "Enter booking date (DD-MM-YYYY): ";
+    cin >> b.date;
+
+    bookings[bookingCount++] = b;
+
+    double tax = b.amount * TAX_RATE;
+    double total = b.amount + tax;
+
+    Invoice inv;
+    inv.invoiceId = nextInvoiceId++;
+    inv.memberId = id;
+    safeCopy(inv.type, sizeof(inv.type), "Booking");
+    inv.refId = b.bookingId;
+    inv.totalCharged = total;
+    safeCopy(inv.date, sizeof(inv.date), b.date);
+    inv.paid = false;
+    inv.receiptGenerated = false;
+    invoices[invoiceCount++] = inv;
+
+    cout << fixed << setprecision(2);
+    printInvoice(inv);
+}
+
+void generateInvoiceAppointment() {
+    if (appointmentCount >= MAX_APPOINTMENTS) { cout << "Appointment list full!\n"; return; }
+
+    int id;
+    cout << "Enter Member ID: ";
+    cin >> id;
+    if (findMemberIndexById(id) == -1) { cout << "Member not found.\n"; return; }
+
+    Appointment a;
+    a.appointmentId = nextAppointmentId++;
+    a.memberId = id;
+
+    cout << "Enter appointment description (e.g., Trainer Consultation): ";
+    cin.ignore();
+    cin.getline(a.description, 50);
+
+    cout << "Enter appointment amount (" << CURRENCY << "): ";
+    cin >> a.amount;
+
+    cout << "Enter appointment date (DD-MM-YYYY): ";
+    cin >> a.date;
+
+    appointments[appointmentCount++] = a;
+
+    double tax = a.amount * TAX_RATE;
+    double total = a.amount + tax;
+
+    Invoice inv;
+    inv.invoiceId = nextInvoiceId++;
+    inv.memberId = id;
+    safeCopy(inv.type, sizeof(inv.type), "Appointment");
+    inv.refId = a.appointmentId;
+    inv.totalCharged = total;
+    safeCopy(inv.date, sizeof(inv.date), a.date);
+    inv.paid = false;
+    inv.receiptGenerated = false;
+    invoices[invoiceCount++] = inv;
+
+    cout << fixed << setprecision(2);
+    printInvoice(inv);
+}
+
+void printInvoice(const Invoice& inv) {
+    cout << "\n--------- INVOICE GENERATED ---------\n";
+    cout << "Invoice ID:   " << inv.invoiceId << "\n";
+    cout << "Member ID:    " << inv.memberId << "\n";
+    cout << "Type:         " << inv.type << "\n";
+    cout << "Date:         " << inv.date << "\n";
+    cout << "Total Charged (incl. tax): " << CURRENCY << inv.totalCharged << "\n";
+    cout << "--------------------------------------\n";
+}
+
+// ==================== 5-8. PAYMENT TYPES ====================
+void payByType(const char type[]) {
+    int id;
+    cout << "Enter Member ID: ";
+    cin >> id;
+    if (findMemberIndexById(id) == -1) { cout << "Member not found.\n"; return; }
+
+    int invIdx;
+    if (!chooseUnpaidInvoice(id, invIdx)) return;
+
+    if (strcmp(type, "E-Wallet") == 0) {
+        cout << "\n[ Scan the QR code below with your e-wallet app ]\n";
+        cout << "   #####  ####   #\n";
+        cout << "   #   # #    #  #\n";
+        cout << "   #####  ####   #\n";
+        cout << "   (QR CODE PLACEHOLDER)\n\n";
+    }
+
+    finalizeInvoicePayment(invIdx, type);
+}
+
+// Records the Payment and marks the Invoice as paid.
+void finalizeInvoicePayment(int invoiceIndex, const char paymentType[]) {
+    if (paymentCount >= MAX_PAYMENTS) { cout << "Payment log full!\n"; return; }
+
+    Invoice& inv = invoices[invoiceIndex];
+
+    Payment p;
+    p.paymentId = nextPaymentId++;
+    p.memberId = inv.memberId;
+    p.invoiceId = inv.invoiceId;
+    safeCopy(p.category, sizeof(p.category), inv.type);
+    p.amount = inv.totalCharged;
+    safeCopy(p.paymentType, sizeof(p.paymentType), paymentType);
+    safeCopy(p.date, sizeof(p.date), inv.date);
+
+    payments[paymentCount++] = p;
+    inv.paid = true;
+
+    cout << fixed << setprecision(2);
+    cout << "\nPayment successful! Payment ID: " << p.paymentId
+        << " | Amount: " << CURRENCY << p.amount
+        << " | Method: " << p.paymentType << "\n";
+}
+
+// ==================== 9 & 10. GENERATE RECEIPTS ====================
+void generateReceiptByType(const char type[]) {
+    int id;
+    cout << "Enter Member ID: ";
+    cin >> id;
+    if (findMemberIndexById(id) == -1) { cout << "Member not found.\n"; return; }
+
+    cout << "\nPaid " << type << " invoices awaiting receipt:\n";
+    bool found = false;
+    for (int i = 0; i < invoiceCount; i++) {
+        if (invoices[i].memberId == id && invoices[i].paid &&
+            !invoices[i].receiptGenerated && strcmp(invoices[i].type, type) == 0) {
+            found = true;
+            cout << "  Invoice #" << invoices[i].invoiceId
+                << " - " << CURRENCY << fixed << setprecision(2) << invoices[i].totalCharged << "\n";
+        }
+    }
+    if (!found) {
+        cout << "No paid " << type << " invoices pending a receipt.\n";
+        return;
+    }
+
+    int invId;
+    cout << "Enter Invoice ID to generate receipt for: ";
+    cin >> invId;
+
+    int idx = findInvoiceIndexById(invId);
+    if (idx == -1 || invoices[idx].memberId != id || !invoices[idx].paid ||
+        invoices[idx].receiptGenerated || strcmp(invoices[idx].type, type) != 0) {
+        cout << "Invalid selection.\n";
+        return;
+    }
+
+    // find matching payment
+    int payIdx = -1;
+    for (int i = 0; i < paymentCount; i++) {
+        if (payments[i].invoiceId == invId) { payIdx = i; break; }
+    }
+    if (payIdx == -1) { cout << "No matching payment record found.\n"; return; }
+
+    if (receiptCount >= MAX_RECEIPTS) { cout << "Receipt log full!\n"; return; }
+
+    Receipt r;
+    r.receiptId = nextReceiptId++;
+    r.paymentId = payments[payIdx].paymentId;
+    r.invoiceId = invId;
+    r.memberId = id;
+    r.amount = invoices[idx].totalCharged;
+    safeCopy(r.date, sizeof(r.date), invoices[idx].date);
+
+    receipts[receiptCount++] = r;
+    invoices[idx].receiptGenerated = true;
+
+    printReceiptSlip(r);
+}
+
+void printReceiptSlip(const Receipt& r) {
+    cout << fixed << setprecision(2);
+    cout << "\n========= RECEIPT =========\n";
+    cout << "Receipt ID:  " << r.receiptId << "\n";
+    cout << "Payment ID:  " << r.paymentId << "\n";
+    cout << "Invoice ID:  " << r.invoiceId << "\n";
+    cout << "Member ID:   " << r.memberId << "\n";
+    cout << "Amount:      " << CURRENCY << r.amount << "\n";
+    cout << "Date:        " << r.date << "\n";
+    cout << "============================\n";
+}
+
+// ==================== 11. VIEW PAYMENT HISTORY (member) ====================
+void viewPaymentHistory() {
+    int id;
+    cout << "Enter Member ID: ";
+    cin >> id;
+    if (findMemberIndexById(id) == -1) { cout << "Member not found.\n"; return; }
+
+    bool found = false;
+    cout << left << setw(10) << "PayID" << setw(14) << "Category"
+        << setw(12) << "Amount" << setw(16) << "Method" << setw(12) << "Date" << endl;
+    cout << string(64, '-') << endl;
+
+    for (int i = 0; i < paymentCount; i++) {
+        if (payments[i].memberId == id) {
+            found = true;
+            cout << left << setw(10) << payments[i].paymentId
+                << setw(14) << payments[i].category
+                << setw(12) << fixed << setprecision(2) << payments[i].amount
+                << setw(16) << payments[i].paymentType
+                << setw(12) << payments[i].date
+                << endl;
+        }
+    }
+    if (!found) cout << "No payment history found for this member.\n";
+}
+
+// ==================== 12. VALIDATION ====================
+void validation() {
+    int id;
+    cout << "Enter Member ID to validate: ";
+    cin >> id;
+
+    int idx = findMemberIndexById(id);
+    if (idx == -1) {
+        cout << "INVALID: No member found with ID " << id << ".\n";
+        return;
+    }
+
+    Member& m = members[idx];
+    cout << "\n--------- VALIDATION RESULT ---------\n";
+    cout << "Member ID:    " << m.id << "\n";
+    cout << "Name:         " << m.name << "\n";
+    cout << "Plan:         " << m.planName << "\n";
+    cout << "Expiry Date:  " << m.expiryDate << "\n";
+    cout << "Status:       " << (m.active ? "VALID / ACTIVE" : "INVALID / INACTIVE") << "\n";
+
+    // check for any unpaid invoices
+    bool hasUnpaid = false;
+    for (int i = 0; i < invoiceCount; i++) {
+        if (invoices[i].memberId == id && !invoices[i].paid) hasUnpaid = true;
+    }
+    cout << "Outstanding Dues: " << (hasUnpaid ? "YES - please clear pending invoices" : "None") << "\n";
+    cout << "--------------------------------------\n";
+}
+
+// ==================== STAFF: VIEW PAYMENT ====================
+void staffViewPayment() {
+    if (paymentCount == 0) { cout << "No payment records found.\n"; return; }
+
+    cout << left << setw(10) << "PayID" << setw(10) << "MemberID" << setw(14) << "Category"
+        << setw(12) << "Amount" << setw(16) << "Method" << setw(12) << "Date" << endl;
+    cout << string(74, '-') << endl;
+
+    for (int i = 0; i < paymentCount; i++) {
+        cout << left << setw(10) << payments[i].paymentId
+            << setw(10) << payments[i].memberId
+            << setw(14) << payments[i].category
+            << setw(12) << fixed << setprecision(2) << payments[i].amount
+            << setw(16) << payments[i].paymentType
+            << setw(12) << payments[i].date
+            << endl;
+    }
+}
+
+// ==================== STAFF: SEARCH PAYMENT ====================
+void staffSearchPayment() {
+    int c;
+    cout << "Search by: 1. Payment ID   2. Member ID\n";
+    cout << "Enter choice: ";
+    cin >> c;
+
+    if (c == 1) {
+        int pid;
+        cout << "Enter Payment ID: ";
+        cin >> pid;
+        for (int i = 0; i < paymentCount; i++) {
+            if (payments[i].paymentId == pid) {
+                cout << fixed << setprecision(2);
+                cout << "\nPayment ID: " << payments[i].paymentId
+                    << "\nMember ID:  " << payments[i].memberId
+                    << "\nCategory:   " << payments[i].category
+                    << "\nAmount:     " << CURRENCY << payments[i].amount
+                    << "\nMethod:     " << payments[i].paymentType
+                    << "\nDate:       " << payments[i].date << "\n";
+                return;
+            }
+        }
+        cout << "Payment not found.\n";
+    }
+    else if (c == 2) {
+        int mid;
+        cout << "Enter Member ID: ";
+        cin >> mid;
+        bool found = false;
+        for (int i = 0; i < paymentCount; i++) {
+            if (payments[i].memberId == mid) {
+                found = true;
+                cout << fixed << setprecision(2);
+                cout << "PayID " << payments[i].paymentId << " | "
+                    << payments[i].category << " | " << CURRENCY << payments[i].amount
+                    << " | " << payments[i].paymentType << " | " << payments[i].date << "\n";
+            }
+        }
+        if (!found) cout << "No payments found for this member.\n";
+    }
+    else {
+        cout << "Invalid choice.\n";
+    }
+}
