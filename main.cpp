@@ -141,7 +141,7 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
         cout << "4. Billing and Payment Processing\n";
         cout << "5. Feedback\n";
         cout << "6. Back\n";
-        cout << "Enter your Choice (1-7): ";
+        cout << "Enter your Choice (1-6): ";
         cin >> menuChoice;
 
         switch (menuChoice) {

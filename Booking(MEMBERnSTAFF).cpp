@@ -209,7 +209,7 @@ void viewServices()
 // SEARCH SERVICES
 // ==============================
 
-void searchServices()
+void searchBookings()
 {
     int searchID;
     int i;
@@ -219,15 +219,24 @@ void searchServices()
 
     bool found = false;
 
-    for (i = 0; i < serviceCount; i++)
+    for (i = 0; i < bookingCount; i++)
     {
-        if (serviceIDs[i] == searchID)
+        if (bookingIDs[i] == searchID)
         {
-            cout << "\nService Found!\n";
-            cout << "Service ID: " << serviceIDs[i] << endl;
-            cout << "Name: " << serviceName[i] << endl;
-            cout << "Category: " << category[i] << endl;
-            cout << "Price: RM " << price[i] << endl;
+            cout << "\nBooking Found!\n";
+            cout << "Booking ID: "
+                    << bookingIDs[i] << endl;
+
+                cout << "Booking ID: "
+                    << bookingServiceIDs[i] << endl;
+
+                cout << "Date: "
+                    << bookingDates[i] << endl;
+
+                cout << "Status: "
+                    << bookingStatus[i] << endl;
+
+                cout << "-----------------------\n";
 
             found = true;
             break;
@@ -236,7 +245,7 @@ void searchServices()
 
     if (!found)
     {
-        cout << "Service not found.\n";
+        cout << "Booking not found.\n";
     }
 }
 
@@ -818,6 +827,7 @@ void staffEditBooking()
 void staffRescheduleOrCancelBooking()
 {
     int bookingID;
+    staffViewAllBookings();
 
     cout << "\n--- Staff: Reschedule / Cancel Booking ---\n";
     cout << "Enter Booking ID: ";
@@ -902,7 +912,7 @@ void memberBookingMenu(int memberID)
             break;
 
         case 2:
-            searchServices();
+            searchBookings();
             break;
 
         case 3:
@@ -983,7 +993,7 @@ void staffBookingMenu()
             break;
 
         case 5:
-            searchServices();
+            searchBookings();
             break;
 
         case 6:

@@ -142,8 +142,8 @@
     <ClCompile Include="advertisement.cpp" />
     <ClCompile Include="appointment.cpp" />
     <ClCompile Include="BillingPaymentProcessing.cpp" />
-    <ClCompile Include="Booking%28MEMBERnSTAFF%29.cpp" />
-    <ClCompile Include="Feedback%28MS%29.cpp" />
+    <ClCompile Include="Booking(MEMBERnSTAFF).cpp" />
+    <ClCompile Include="Feedback(MS).cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="management.cpp" />
     <ClCompile Include="reporting and statistic.cpp" />

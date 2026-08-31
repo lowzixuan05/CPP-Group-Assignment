@@ -18,25 +18,25 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Booking%28MEMBERnSTAFF%29.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Feedback%28MS%29.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="management.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="advertisement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="appointment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="reporting and statistic.cpp">
+    <ClCompile Include="BillingPaymentProcessing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BillingPaymentProcessing.cpp">
+    <ClCompile Include="Booking(MEMBERnSTAFF).cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Feedback(MS).cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="management.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="reporting and statistic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
