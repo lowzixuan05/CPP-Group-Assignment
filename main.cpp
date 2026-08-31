@@ -11,14 +11,15 @@ extern void staffBookingMenu();
 extern void staffFeedbackMenu();
 extern void advertisementModule();
 extern void reporting();
+void staffPortal();
 
 //Member Modules
 extern void memberMemberManagementMenu();
 extern void memberBookingMenu(int memberID);
 extern void appointmentModule();
 extern void memberFeedbackMenu(int memberID);
-extern void mainMenu();
-
+extern void billingStart();
+void memberPortal();
 
 
 int main()
@@ -67,7 +68,7 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
 \  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \
  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__
             )";
-        cout << "\nWelcome to Member Menu\n";
+        cout << "\nWelcome to Staff Menu\n";
         cout << "1. Member Management\n";
         cout << "2. Booking\n";
         cout << "3. Appointment\n";
@@ -88,7 +89,7 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
             break;
         case 4:advertisementModule();
             break;
-        case 5:mainMenu();
+        case 5:staffPortal();
             break;
         case 6:reporting();
             break;
@@ -150,9 +151,9 @@ __\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\  \__\
             break;
         case 3:appointmentModule();
             break;
-        case 4:advertisementModule();
+        case 4:memberPortal();
             break;
-            case 5: memberFeedbackMenu(memberID);
+        case 5: memberFeedbackMenu(memberID);
             break;
         case 6:break;
         default:cout << "Invalid Choice! Try Again!";

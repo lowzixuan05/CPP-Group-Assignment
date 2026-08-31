@@ -101,7 +101,7 @@ MembershipPlan plans[NUM_PLANS] = {
     {"Elite",   150.0, 10.0}
 };
 
-Member       members[MAX_MEMBERS];       int memberCount = 0;
+Member       members[MAX_MEMBERS];       extern int memberCount;
 Booking      bookings[MAX_BOOKINGS];     int bookingCount = 0;
 Appointment  appointments[MAX_APPOINTMENTS]; int appointmentCount = 0;
 Invoice      invoices[MAX_INVOICES];     int invoiceCount = 0;
@@ -117,7 +117,7 @@ int nextReceiptId = 6001;
 
 // ==================== PROTOTYPES ====================
 // Menus
-void splash();
+void billingStart();
 void mainMenu();
 void memberPortal();
 void staffPortal();
@@ -149,7 +149,7 @@ void printInvoice(const Invoice& inv);
 void printReceiptSlip(const Receipt& r);
 
 // ==================== MAIN ====================
-void splash() {
+void billingStart(){
     cout << "=========================================\n";
     cout << "   GYM MEMBERSHIP BILLING & PAYMENT SYSTEM\n";
     cout << "=========================================\n";
@@ -158,7 +158,7 @@ void splash() {
 }
 
 // ==================== MAIN MENU ====================
-void mainMenu() {
+void mainMenu(){
     int choice;
     do {
         cout << "\n============ MAIN MENU ============\n";

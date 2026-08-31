@@ -141,14 +141,12 @@
   <ItemGroup>
     <ClCompile Include="advertisement.cpp" />
     <ClCompile Include="appointment.cpp" />
+    <ClCompile Include="BillingPaymentProcessing.cpp" />
     <ClCompile Include="Booking%28MEMBERnSTAFF%29.cpp" />
     <ClCompile Include="Feedback%28MS%29.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="management.cpp" />
     <ClCompile Include="reporting and statistic.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Billing &amp; Payment Processing.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

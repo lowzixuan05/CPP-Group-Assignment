@@ -7,7 +7,7 @@ using namespace std;
 // MEMBER DATA
 // =====================================================
 
-struct Member
+struct Members
 {
     string memberID;
     string memberName;
@@ -17,14 +17,14 @@ struct Member
     string membershipStatus;
 };
 
-Member members[3] =
+Members members[3] =
 {
     {"M001", "John", 25, "Male", "Monthly", "Active"},
     {"M002", "Mary", 30, "Female", "Yearly", "Active"},
     {"M003", "Ali", 40, "Male", "Monthly", "Expired"}
 };
 
-int memberCount = 3;
+extern int memberCount = 3;
 
 
 // =====================================================

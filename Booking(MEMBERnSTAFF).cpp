@@ -42,7 +42,7 @@ int bookingServiceIDs[MAX_BOOKINGS];
 string bookingDates[MAX_BOOKINGS];
 string bookingStatus[MAX_BOOKINGS];
 
-int bookingCount = 0;
+extern int bookingCount;
 
 // ==============================
 // STAFF: ADD SERVICE

@@ -36,10 +36,8 @@
     <ClCompile Include="reporting and statistic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Billing &amp; Payment Processing">
+    <ClCompile Include="BillingPaymentProcessing.cpp">
       <Filter>Source Files</Filter>
-    </None>
+    </ClCompile>
   </ItemGroup>
 </Project>
